@@ -32,7 +32,12 @@ abstract class Resolver
 	/**
 	 * @var  boolean  $resolveNamedParams  wether to resolve named parameters
 	 */
-	protected $resolveNamedParams = false;
+	protected $resolveNamedParams = true;
+
+	/**
+	 * @var  boolean  $resolveParamClass  wether to resolve named parameters
+	 */
+	protected $resolveParamClass = true;
 
 	/**
 	 * Sets the Container
@@ -153,52 +158,44 @@ abstract class Resolver
 	 */
 	public function resolveParameter($param)
 	{
-		$identifier = $param->getName();
-		$name = null;
-
-		// Resolve param injection alias
-		if (isset($this->paramInjections[$identifier]))
+		if ($this->resolveNamedParams)
 		{
-			list($identifier, $name) = $this->paramInjections[$identifier];
-		}
+			$identifier = $param->getName();
+			$name = null;
 
-		try
-		{
-			return $this->container->resolve($identifier, $name);
-		}
-		catch (ResolveException $e)
-		{
-			// Let this exception fly, there are
-			// other ways to retrieve the dependency
-		}
-
-		$class = $param->getClass();
-
-		if ( ! $class)
-		{
-			if ($param->isDefaultValueAvailable())
+			// Resolve param injection alias
+			if (isset($this->paramInjections[$identifier]))
 			{
-				return $param->getDefaultValue();
+				list($identifier, $name) = $this->paramInjections[$identifier];
 			}
 
-			$class = $param->getDeclaringClass()->getName();
-
-			throw new ResolveException('Could not resolve parameter '.$param->getName().' for '.$class);
-		}
-
-		try
-		{
-			return $this->container->resolve($class->getName());
-		}
-		catch(ResolveException $e)
-		{
-			if ($param->isDefaultValueAvailable())
+			try
 			{
-				return $param->getDefaultValue();
+				return $this->container->resolve($identifier, $name);
 			}
-
-			throw $e;
+			catch (ResolveException $e)
+			{
+				// Let this exception fly, there are
+				// other ways to retrieve the dependency
+			}
 		}
+
+		if ($this->resolveParamClass and $class = $param->getClass())
+		{
+			try
+			{
+				return $this->container->resolve($class->getName());
+			}
+			catch(ResolveException $e) {}
+		}
+
+		if ($param->isDefaultValueAvailable())
+		{
+			return $param->getDefaultValue();
+		}
+
+		$class = $param->getDeclaringClass()->getName();
+		throw new ResolveException('Could not resolve parameter '.$param->getName().' for '.$class);
 	}
 
 	/**

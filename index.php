@@ -57,8 +57,8 @@ $container->register('eh', 'Dependant', function($entry) {
 });
 
 $dummy = $container->resolve('dummy.haha');
-print_r($dummy);
-die();
+//print_r($dummy);
+//die();
 
 var_dump($container->resolve('eh'));
 
