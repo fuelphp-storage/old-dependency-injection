@@ -2,7 +2,7 @@
 
 namespace Fuel\DependencyInjection;
 
-abstract class Resolver extends Factory
+abstract class Resolver
 {
 	/**
 	 * @var  boolean  $allowSIngleton  wether to allow singletons
