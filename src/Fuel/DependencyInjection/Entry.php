@@ -14,9 +14,10 @@ class Entry extends Resolver
 	 *
 	 * @param  callable  $factory
 	 */
-	public function __construct($factory)
+	public function __construct($factory, $container = null)
 	{
 		$this->factory = $factory;
+		$container and $this->container = $container;
 	}
 
 	/**

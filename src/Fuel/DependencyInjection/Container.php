@@ -45,6 +45,11 @@ class Container
 			$dependency = $this->providerLookup($identifier, $name);
 		}
 
+		if ( ! $dependency)
+		{
+			$dependency = $this->dynamicLoopup($identifier, $name);
+		}
+
 		// We have failed to resolve the dependencies,
 		// it is time to bring the pain.
 		if ( ! $dependency)
@@ -79,7 +84,7 @@ class Container
 	 * @param   string       $name        instance name
 	 * @return  object|null  dependency or null when not found
 	 */
-	protected function findCached($identifier, $name)
+	public function findCached($identifier, $name = null)
 	{
 		$cacheKey = $identifier.'::'.($name ?: $identifier);
 
@@ -134,7 +139,7 @@ class Container
 	 *
 	 * @param   string  $identifier  identifier
 	 */
-	protected function providerLookup($identifier, $name)
+	public function providerLookup($identifier, $name = null)
 	{
 		if ( ! $provider = $this->findProvider($identifier))
 		{
@@ -142,6 +147,13 @@ class Container
 		}
 
 		return $provider->resolve($identifier, $name);
+	}
+
+	public function dynamicLoopup($identifier, $name = null)
+	{
+		$entry = new Entry($identifier, $this);
+
+		return $entry->resolve($identifier, $name);
 	}
 
 	public function register($identifier, $factory, $config = null)
