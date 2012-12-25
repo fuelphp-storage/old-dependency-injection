@@ -163,20 +163,21 @@ abstract class Resolver
 
 		// Forge can return a string, in which case we'll need
 		// to convert that into a class.
-		$result = $this->ensureInstance($result);
+		$result = $this->formatOutput($result);
 
-		if ($name)
-		{
-			// Cache named instances
-			$this->container->inject($identifier, $result, $name);
-		}
-
+		// Resolve method injections.
 		foreach ($this->methodInjections as $method => $injection)
 		{
 			list($identifier, $name) = $injection;
 			$dependency = $this->container->resolve($identifier, $name);
 
 			$result->{$method}($dependency);
+		}
+
+		if ($name)
+		{
+			// Cache named instances
+			$this->container->inject($identifier, $result, $name);
 		}
 
 		return $result;
@@ -240,24 +241,19 @@ abstract class Resolver
 	 * @return  object  resolved dependency
 	 * @throws  ResolveException
 	 */
-	protected function ensureInstance($result)
+	protected function formatOutput($result)
 	{
 		if (is_callable($result))
 		{
 			$result = call_user_func($result, $this->container);
 		}
 
-		if (is_object($result))
+		if (is_string($result) and class_exists($result, true))
 		{
-			return $result;
+			return $this->resolveDependencies($result);
 		}
 
-		if ( ! is_string($result)  or ! class_exists($result, true))
-		{
-			throw new ResolveException('Resolving returned unexpected output: '.print_r($result, true));
-		}
-
-		return $this->resolveDependencies($result);
+		return $result;
 	}
 
 	/**

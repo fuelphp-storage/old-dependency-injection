@@ -25,7 +25,7 @@ class Entry extends Resolver
 	 *
 	 * @return  mixed  dependancy result
 	 */
-	public function forge()
+	public function forge($container)
 	{
 		return $this->factory;
 	}

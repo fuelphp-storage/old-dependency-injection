@@ -198,7 +198,7 @@ class Container
 	 * @param   string  $name        dependency name
 	 * @return  $this
 	 */
-	public function inject($identifier, $dependency, $name = null)
+	public function inject($identifier, &$dependency, $name = null)
 	{
 		$cacheKey = $identifier.'::'.($name ?: $identifier);
 		$this->instances[$cacheKey] = $dependency;
