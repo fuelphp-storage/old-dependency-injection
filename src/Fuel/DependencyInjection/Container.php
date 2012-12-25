@@ -64,11 +64,6 @@ class Container
 	 */
 	public function resolveEntry($identifier, $name = null)
 	{
-		if ($name !== false and $cached = $this->findCached($identifier, $name))
-		{
-			return $cached;
-		}
-
 		if ( ! isset($this->entries[$identifier]))
 		{
 			return false;

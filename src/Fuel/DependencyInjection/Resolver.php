@@ -2,7 +2,7 @@
 
 namespace Fuel\DependencyInjection;
 
-abstract class Resolver
+abstract class Resolver extends Factory
 {
 	/**
 	 * @var  boolean  $allowSIngleton  wether to allow singletons
@@ -66,7 +66,20 @@ abstract class Resolver
 	}
 
 	/**
-	 * Allow or disallow singletons
+	 * Block singletons
+	 *
+	 * @param   boolean  $allow  wether to block singletons
+	 * @return  $this
+	 */
+	public function blockSingleton($allow = true)
+	{
+		$this->allowSingleton = ! $allow;
+
+		return $this;
+	}
+
+	/**
+	 * Allow singletons
 	 *
 	 * @param   boolean  $allow  wether to allow singletons
 	 * @return  $this
@@ -126,28 +139,50 @@ abstract class Resolver
 	}
 
 	/**
-	 * Resolve class dependencies.
+	 * Resolve a dependency
 	 *
-	 * @param   string  $class  class name
-	 * @return  object  resolved object with injected dependencies
+	 * @param   string  $identifier  identifier
+	 * @param   string  $name        instance name
+	 * @return  object  resolved dependency
+	 * @throws  Fuel\DependencyInjection\ResolveException
 	 */
-	protected function resolveDependencies($class)
+	public function resolve($identifier, $name)
 	{
-		$reflection = new \ReflectionClass($class);
-		$constructor = $reflection->getConstructor();
+		// Get singleton preferences.
+		$this->prepareIdentifiers($identifier, $name);
 
-		if ( ! $constructor)
+		// Strip the root from the identifier
+		$suffix = substr($identifier, strlen($this->root));
+
+		if ($suffix)
 		{
-			// In this case there are no dependencies to inject
-			// So we can just return a new instance
-			return $reflection->newInstance();
+			$suffix = trim($suffix, '.');
 		}
 
-		$resolver = array($this, 'resolveParameter');
-		$params = array_map($resolver, $constructor->getParameters());
+		$result = $this->forge($this->container, $suffix ?: null);
 
-		return $reflection->newInstanceArgs($params);
+		// Forge can return a string, in which case we'll need
+		// to convert that into a class.
+		$result = $this->ensureInstance($result);
+
+		if ($name)
+		{
+			// Cache named instances
+			$this->container->inject($identifier, $result, $name);
+		}
+
+		foreach ($this->methodInjections as $method => $injection)
+		{
+			list($identifier, $name) = $injection;
+			$dependency = $this->container->resolve($identifier, $name);
+
+			$result->{$method}($dependency);
+		}
+
+		return $result;
 	}
+
+
 
 	/**
 	 * Resolve a reflection parameter depencency
@@ -226,47 +261,58 @@ abstract class Resolver
 	}
 
 	/**
-	 * Resolve a dependency
+	 * Set wether to resolve params by class hinting
 	 *
-	 * @param   string  $identifier  identifier
-	 * @param   string  $name        instance name
-	 * @return  object  resolved dependency
-	 * @throws  Fuel\DependencyInjection\ResolveException
+	 * @param   boolean  $resolve  wether to resolve by class hinting
+	 * @return  $this
 	 */
-	public function resolve($identifier, $name)
+	public function resolveParamClass($resolve = true)
 	{
-		// Get singleton preferences.
-		$this->prepareIdentifiers($identifier, $name);
+		$this->resolveParamClass = $resolve;
 
-		// Strip the root from the identifier
-		$suffix = substr($identifier, strlen($this->root));
+		return $this;
+	}
 
-		if ($suffix)
+	/**
+	 * Set wether to resolve params by name
+	 *
+	 * @param   boolean  $resolve  wether to resolve by name
+	 * @return  $this
+	 */
+	public function resolveNamedParams($resolve = true)
+	{
+		$this->resolveNamedParams = $resolve;
+
+		return $this;
+	}
+
+	/**
+	 * Resolve class dependencies.
+	 *
+	 * @param   string  $class  class name
+	 * @return  object  resolved object with injected dependencies
+	 */
+	protected function resolveDependencies($class)
+	{
+		if ( ! $this->resolveNamedParams and ! $this->resolveParamClass)
 		{
-			$suffix = trim($suffix, '.');
+			return new $class;
 		}
 
-		$result = $this->forge($this->container, $suffix ?: null);
+		$reflection = new \ReflectionClass($class);
+		$constructor = $reflection->getConstructor();
 
-		// Forge can return a string, in which case we'll need
-		// to convert that into a class.
-		$result = $this->ensureInstance($result);
-
-		if ($name)
+		if ( ! $constructor)
 		{
-			// Cache named instances
-			$this->container->inject($identifier, $result, $name);
+			// In this case there are no dependencies to inject
+			// So we can just return a new instance
+			return $reflection->newInstance();
 		}
 
-		foreach ($this->methodInjections as $method => $injection)
-		{
-			list($identifier, $name) = $injection;
-			$dependency = $this->container->resolve($identifier, $name);
+		$resolver = array($this, 'resolveParameter');
+		$params = array_map($resolver, $constructor->getParameters());
 
-			$result->{$method}($dependency);
-		}
-
-		return $result;
+		return $reflection->newInstanceArgs($params);
 	}
 
 	/**
