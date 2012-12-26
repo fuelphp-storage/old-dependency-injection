@@ -136,17 +136,16 @@ When resolving dependencies the container has a couple of ways to automatically 
 
 ### Named params… wait what?
 
-Yes and this is not PHP5.5 or python. Through the power or the super handy reflection classes it's possible to define automatically detect dependencies by sniffing parameter names. Named parameters are only available when the return type is a string class name.
+Yes and this is not python. Through the power or the super handy reflection classes it's possible to define automatically detect dependencies by sniffing parameter names. Named parameters are only available when the return type is a string class name.
 
 ```
-
 class Something {}
 
 class Depending
 {
 	protected $dependancy;
 	
-	public function __construct($myDepencency)
+	public function __construct($myDependency)
 	{
 		$this->dependency = $myDependency;
 	}
@@ -159,3 +158,33 @@ $depending = $container->resolve('Depending');
 
 The code above will successfully inject an instance of `Something` into the `Depending` class.
 
+### Method injection
+
+Another way of injection dependencies is though setters. To do this, list the methods that need to be called in the entry configuration:
+
+
+```
+$container->register('user', 'Model\User', function($entry) {
+	$entry->methodInjection('addStorage', '');
+});
+```
+
+### Class hinting
+
+Class hinting is normally used to force a particular type of value to be passed to a function. Once again, though the power of reflection this is something we can take into account.
+
+```
+class Something {}
+
+class Depending
+{
+	protected $dep;
+	
+	public function __construct(Something $dep)
+	{
+		$this->dep = $dep;
+	}
+}
+
+$depending = $resolving->resolve('Depending');
+```

@@ -38,7 +38,7 @@ class Container
 		// Try to resolve from a local entries
 		$dependency = $this->resolveEntry($identifier, $name);
 
-		if ( ! $dependency)
+		if ( ! $dependency and ! empty($this->providers))
 		{
 			// Fall back to providers, this is
 			// more expensive.
@@ -63,18 +63,16 @@ class Container
 	/**
 	 * Resolve a depenency
 	 *
-	 * @param   string  $identifier  identifier
-	 * @param   string  $name        optional instance name
-	 * @return
+	 * @param   string      $identifier  identifier
+	 * @param   string      $name        optional instance name
+	 * @return  mixed|null  resoled result if available, otherwise null
 	 */
 	public function resolveEntry($identifier, $name = null)
 	{
-		if ( ! isset($this->entries[$identifier]))
+		if (isset($this->entries[$identifier]))
 		{
-			return false;
+			return $this->entries[$identifier]->resolve($identifier, $name);
 		}
-
-		return $this->entries[$identifier]->resolve($identifier, $name);
 	}
 
 	/**

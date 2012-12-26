@@ -166,13 +166,8 @@ abstract class Resolver
 		$result = $this->formatOutput($result);
 
 		// Resolve method injections.
-		foreach ($this->methodInjections as $method => $injection)
-		{
-			list($identifier, $name) = $injection;
-			$dependency = $this->container->resolve($identifier, $name);
-
-			$result->{$method}($dependency);
-		}
+		if ( ! empty($this->methodInjections))
+			$this->injectMethodDependencies($result);
 
 		if ($name)
 		{
@@ -183,7 +178,27 @@ abstract class Resolver
 		return $result;
 	}
 
+	/**
+	 * Ensure an an object instance.
+	 *
+	 * @param   mixed   $result  forge result
+	 * @return  object  resolved dependency
+	 * @throws  ResolveException
+	 */
+	protected function formatOutput($result)
+	{
+		if (is_callable($result))
+		{
+			$result = call_user_func($result, $this->container);
+		}
 
+		if (is_string($result) and class_exists($result, true))
+		{
+			return $this->createInstance($result);
+		}
+
+		return $result;
+	}
 
 	/**
 	 * Resolve a reflection parameter depencency
@@ -237,28 +252,6 @@ abstract class Resolver
 	}
 
 	/**
-	 * Ensure an an object instance.
-	 *
-	 * @param   mixed   $result  forge result
-	 * @return  object  resolved dependency
-	 * @throws  ResolveException
-	 */
-	protected function formatOutput($result)
-	{
-		if (is_callable($result))
-		{
-			$result = call_user_func($result, $this->container);
-		}
-
-		if (is_string($result) and class_exists($result, true))
-		{
-			return $this->resolveDependencies($result);
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Set wether to resolve params by class hinting
 	 *
 	 * @param   boolean  $resolve  wether to resolve by class hinting
@@ -290,7 +283,7 @@ abstract class Resolver
 	 * @param   string  $class  class name
 	 * @return  object  resolved object with injected dependencies
 	 */
-	protected function resolveDependencies($class)
+	protected function createInstance($class)
 	{
 		if ( ! $this->resolveNamedParams and ! $this->resolveParamClass)
 		{
@@ -326,6 +319,22 @@ abstract class Resolver
 		$this->methodInjections[$method] = array($identifier, $name);
 
 		return $this;
+	}
+
+	/**
+	 * Inject method dependencies.
+	 *
+	 * @param   object  $instance  dependency
+	 */
+	protected function injectMethodDependencies(&$instance)
+	{
+		foreach ($this->methodInjections as $method => $injection)
+		{
+			list($identifier, $name) = $injection;
+			$dependency = $this->container->resolve($identifier, $name);
+
+			$result->{$method}($dependency);
+		}
 	}
 
 	/**
