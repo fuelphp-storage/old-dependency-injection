@@ -225,11 +225,13 @@ abstract class Resolver
 			catch(ResolveException $e) {}
 		}
 
+		// We'll fall back to a default value
 		if ($param->isDefaultValueAvailable())
 		{
 			return $param->getDefaultValue();
 		}
 
+		// We're not in luck, resolving has failed
 		$class = $param->getDeclaringClass()->getName();
 		throw new ResolveException('Could not resolve parameter '.$param->getName().' for '.$class);
 	}

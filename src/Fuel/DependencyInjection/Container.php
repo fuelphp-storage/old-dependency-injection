@@ -120,24 +120,25 @@ class Container
 	 */
 	public function singleton($identifier)
 	{
-		return $this->retrieve($identifier, $identifier);
+		return $this->resolve($identifier, $identifier);
 	}
 
 	/**
 	 * Forge a new instance.
 	 *
 	 * @param   string  $identifier  dependency identifier
-	 * @return  object  resolved dependency
+	 * @return  mixed  resolved dependency
 	 */
 	public function forge($identifier)
 	{
-		return $this->retrieve($identifier, false);
+		return $this->resolve($identifier, false);
 	}
 
 	/**
 	 * Resolve a dependency through registered providers.
 	 *
 	 * @param   string  $identifier  identifier
+	 * @param   string  $name        instance name
 	 */
 	public function providerLookup($identifier, $name = null)
 	{
@@ -149,6 +150,13 @@ class Container
 		return $provider->resolve($identifier, $name);
 	}
 
+	/**
+	 * Resolve a non-registered class.
+	 *
+	 * @param   string  $idenfitier  identifier
+	 * @param   string  $name        instance name
+	 * @return  mixed  resolved resource
+	 */
 	public function dynamicLoopup($identifier, $name = null)
 	{
 		$entry = new Entry($identifier, $this);
@@ -156,6 +164,14 @@ class Container
 		return $entry->resolve($identifier, $name);
 	}
 
+	/**
+	 * Register a dependency resolver
+	 *
+	 * @param   string   $identifier  identifier
+	 * @param   mixed    $factory     string class name, object or callable that returns one of those
+	 * @param   closure  $config      configuration callback
+	 * @return  $this
+	 */
 	public function register($identifier, $factory, $config = null)
 	{
 		if ( ! $factory instanceof Entry)
@@ -201,7 +217,7 @@ class Container
 	public function inject($identifier, &$dependency, $name = null)
 	{
 		$cacheKey = $identifier.'::'.($name ?: $identifier);
-		$this->instances[$cacheKey] = $dependency;
+		$this->instances[$cacheKey] = &$dependency;
 
 		return $this;
 	}

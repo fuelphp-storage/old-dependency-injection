@@ -134,11 +134,13 @@ When resolving dependencies the container has a couple of ways to automatically 
 * param injection,
 * or class hinting.
 
-### What? Named params?
+### Named params… wait what?
 
-Yes, this is not python, but php. Through the power or the super handy reflection classes it's possible to define automatically detect dependencies by sniffing parameter names. Named parameters are only available when the return type is a string class name.
+Yes and this is not PHP5.5 or python. Through the power or the super handy reflection classes it's possible to define automatically detect dependencies by sniffing parameter names. Named parameters are only available when the return type is a string class name.
 
 ```
+
+class Something {}
 
 class Depending
 {
@@ -151,6 +153,9 @@ class Depending
 }
 
 $container->register('myDependency', 'Something');
-$container->register('identifier', 'Depending');
 
-$
+$depending = $container->resolve('Depending');
+```
+
+The code above will successfully inject an instance of `Something` into the `Depending` class.
+

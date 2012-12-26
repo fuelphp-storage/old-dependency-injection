@@ -5,14 +5,15 @@ namespace Fuel\DependencyInjection;
 class Entry extends Resolver
 {
 	/**
-	 * @var  callable|string  $factory  instance constructor
+	 * @var  callable|string|object  $factory  object, classname or callable returning one of those
 	 */
 	protected $factory;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param  callable  $factory
+	 * @param  callable                            $factory
+	 * @param  Fuel\DependencyInjection\Container  $container  container
 	 */
 	public function __construct($factory, $container = null)
 	{
