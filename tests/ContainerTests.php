@@ -84,6 +84,19 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 		$this->assertTrue($hashA !== $hashD);
 	}
 
+	public function testPreferSingleton()
+	{
+		$container = new Container();
+		$container->register('dep', 'stdClass', function($entry){
+			$entry->preferSingleton();
+		});
+		$a = $container->resolve('dep');
+		$b = $container->singleton('dep');
+		$hashA = spl_object_hash($a);
+		$hashB = spl_object_hash($b);
+		$this->assertEquals($hashA, $hashB);
+	}
+
 	/**
 	 * @expectedException Fuel\DependencyInjection\ResolveException
 	 */
@@ -273,5 +286,57 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 	{
 		$container = new Container;
 		$container->resolve('ResolveFail');
+	}
+
+	/**
+	 * @expectedException  Fuel\DependencyInjection\ResolveException
+	 */
+	public function testProviderLookupFail()
+	{
+		$container = new Container;
+		$container->registerProvider('this.root', new ProviderThatForges);
+
+		$container->resolve('something.unknown');
+	}
+
+	/**
+	 * @expectedException  Fuel\DependencyInjection\ResolveException
+	 */
+	public function testProviderUnregister()
+	{
+		$container = new Container;
+		$container->registerProvider('provider', new ProviderThatForges);
+		$result = $container->resolve('provider.stdClass');
+		$this->assertInstanceOf('stdClass', $result);
+		$container->unregisterProvider('provider');
+		$container->resolve('provider.stdClass');
+		$this->assertInstanceOf('stdClass', $result);
+	}
+
+	public function testDontResolveParams()
+	{
+		$container = new Container;
+		$container->register('dep', 'PlainClass', function($entry){
+			$entry->resolveParamAlias(false)
+				->resolveParamClass(false);
+		});
+
+		$result = $container->resolve('dep');
+		$this->assertInstanceOf('PlainClass', $result);
+	}
+
+	public function testMethodInjection()
+	{
+		$container = new Container;
+		$object = new stdClass;
+
+		$container->register('dep', 'InjectableThroughMethod', function($entry) use ($object){
+			$entry->methodInjection('setString', 'stdClass');
+			$entry->methodInjection('setObject', $object);
+		});
+
+		$dep = $container->resolve('dep');
+		$this->assertEquals($object, $dep->string);
+		$this->assertInstanceOf('stdClass', $dep->object);
 	}
 }

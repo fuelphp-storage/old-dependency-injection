@@ -92,20 +92,6 @@ abstract class Resolver
 	}
 
 	/**
-	 * Turn parameter name resolving on or off.
-	 *
-	 * @param   boolean  $allow  wether to allow named parameter resolving
-	 * @return  $this
-	 */
-	public function allowParamAlias($allow = true)
-	{
-		$this->allowParamAlias = $allow;
-
-		return $this;
-	}
-
-
-	/**
 	 * Set wether singletons are prefered
 	 *
 	 * @param   boolean  $prefer  wether to prefer singletons
@@ -335,8 +321,12 @@ abstract class Resolver
 	{
 		foreach ($this->methodInjections as $method => $injection)
 		{
-			list($identifier, $name) = $injection;
-			$dependency = $this->container->resolve($identifier, $name);
+			list($dependency, $name) = $injection;
+
+			if (is_string($dependency))
+			{
+				$dependency = $this->container->resolve($dependency, $name);
+			}
 
 			$instance->{$method}($dependency);
 		}

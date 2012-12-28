@@ -67,3 +67,22 @@ class CauseOfFail
 {
 	public function __construct($something) {}
 }
+
+class PlainClass {}
+
+class InjectableThroughMethod
+{
+	public $string;
+
+	public $object;
+
+	public function setString($string)
+	{
+		$this->string = $string;
+	}
+
+	public function setObject($object)
+	{
+		$this->object = $object;
+	}
+}
