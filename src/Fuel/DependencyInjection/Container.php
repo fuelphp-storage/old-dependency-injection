@@ -30,7 +30,7 @@ class Container
 	public function resolve($identifier, $name = null)
 	{
 		// Return any previously named instances
-		if ($name !== false and $cached = $this->findCached($identifier, $name))
+		if (func_num_args() > 1 and $name !== false and $cached = $this->findCached($identifier, $name))
 		{
 			return $cached;
 		}
@@ -47,7 +47,7 @@ class Container
 
 		if ( ! $dependency)
 		{
-			$dependency = $this->dynamicLoopup($identifier, $name);
+				$dependency = $this->dynamicLoopup($identifier, $name);
 		}
 
 		// We have failed to resolve the dependencies,
@@ -99,11 +99,11 @@ class Container
 	 * @param   string       $name        instance name
 	 * @return  $this
 	 */
-	protected function removeCached($identifier, $name = null)
+	public function removeCached($identifier, $name = null)
 	{
 		$cacheKey = $identifier.'::'.($name ?: $identifier);
 
-		if (isset($this->instance[$cacheKey]))
+		if (isset($this->instances[$cacheKey]))
 		{
 			unset($this->instances[$cacheKey]);
 		}
@@ -140,12 +140,10 @@ class Container
 	 */
 	public function providerLookup($identifier, $name = null)
 	{
-		if ( ! $provider = $this->findProvider($identifier))
+		if ($provider = $this->findProvider($identifier))
 		{
-			return false;
+			return $provider->resolve($identifier, $name);
 		}
-
-		return $provider->resolve($identifier, $name);
 	}
 
 	/**
@@ -159,7 +157,14 @@ class Container
 	{
 		$entry = new Entry($identifier, $this);
 
-		return $entry->resolve($identifier, $name);
+		try
+		{
+			return $entry->resolve($identifier, $name);
+		}
+		catch (ResolveException $e)
+		{
+			// Ignore this exception
+		}
 	}
 
 	/**
@@ -231,6 +236,12 @@ class Container
 	{
 		$provider->setContainer($this);
 		$provider->setRoot($root);
+
+		if ($config)
+		{
+			$config($provider);
+		}
+
 		$provider->provide($this);
 		$this->providers[$root] = $provider;
 

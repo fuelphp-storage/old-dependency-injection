@@ -30,9 +30,9 @@ abstract class Resolver
 	protected $methodInjections = array();
 
 	/**
-	 * @var  boolean  $resolveNamedParams  wether to resolve named parameters
+	 * @var  boolean  $resolveParamAlias  wether to resolve named parameters
 	 */
-	protected $resolveNamedParams = true;
+	protected $resolveParamAlias = true;
 
 	/**
 	 * @var  boolean  $resolveParamClass  wether to resolve named parameters
@@ -97,9 +97,9 @@ abstract class Resolver
 	 * @param   boolean  $allow  wether to allow named parameter resolving
 	 * @return  $this
 	 */
-	public function allowNamedParams($allow = true)
+	public function allowParamAlias($allow = true)
 	{
-		$this->allowNamedParams = $allow;
+		$this->allowParamAlias = $allow;
 
 		return $this;
 	}
@@ -156,7 +156,7 @@ abstract class Resolver
 
 		if ($suffix)
 		{
-			$suffix = trim($suffix, '.');
+			$suffix = trim($suffix, '.\\');
 		}
 
 		$result = $this->forge($this->container, $suffix ?: null);
@@ -192,12 +192,17 @@ abstract class Resolver
 			$result = call_user_func($result, $this->container);
 		}
 
+		if (is_object($result))
+		{
+			return $result;
+		}
+
 		if (is_string($result) and class_exists($result, true))
 		{
 			return $this->createInstance($result);
 		}
 
-		return $result;
+		throw new ResolveException('Could not resolve, unexpected output output: '.print_r($result, true));
 	}
 
 	/**
@@ -209,15 +214,15 @@ abstract class Resolver
 	 */
 	public function resolveParameter($param)
 	{
-		if ($this->resolveNamedParams)
+		if ($this->resolveParamAlias)
 		{
 			$identifier = $param->getName();
 			$name = null;
 
-			// Resolve param injection alias
-			if (isset($this->paramInjections[$identifier]))
+			// Resolve param alias
+			if (isset($this->paramAlias[$identifier]))
 			{
-				list($identifier, $name) = $this->paramInjections[$identifier];
+				list($identifier, $name) = $this->paramAlias[$identifier];
 			}
 
 			try
@@ -270,9 +275,9 @@ abstract class Resolver
 	 * @param   boolean  $resolve  wether to resolve by name
 	 * @return  $this
 	 */
-	public function resolveNamedParams($resolve = true)
+	public function resolveParamAlias($resolve = true)
 	{
-		$this->resolveNamedParams = $resolve;
+		$this->resolveParamAlias = $resolve;
 
 		return $this;
 	}
@@ -285,7 +290,7 @@ abstract class Resolver
 	 */
 	protected function createInstance($class)
 	{
-		if ( ! $this->resolveNamedParams and ! $this->resolveParamClass)
+		if ( ! $this->resolveParamAlias and ! $this->resolveParamClass)
 		{
 			return new $class;
 		}
@@ -333,7 +338,7 @@ abstract class Resolver
 			list($identifier, $name) = $injection;
 			$dependency = $this->container->resolve($identifier, $name);
 
-			$result->{$method}($dependency);
+			$instance->{$method}($dependency);
 		}
 	}
 
@@ -345,9 +350,9 @@ abstract class Resolver
 	 * @param   string  $name        instance name
 	 * @return  $this
 	 */
-	public function paramInjection($param, $identifier, $name = null)
+	public function paramAlias($param, $identifier, $name = null)
 	{
-		$this->paramInjections[$param] = array($identifier, $name);
+		$this->paramAlias[$param] = array($identifier, $name);
 
 		return $this;
 	}
