@@ -340,7 +340,7 @@ abstract class Resolver
 	 * @param   string  $name        instance name
 	 * @return  $this
 	 */
-	public function paramAlias($param, $identifier, $name = null)
+	public function aliasParam($param, $identifier, $name = null)
 	{
 		$this->paramAlias[$param] = array($identifier, $name);
 

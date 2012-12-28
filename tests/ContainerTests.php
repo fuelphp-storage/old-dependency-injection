@@ -262,7 +262,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 		$container = new Container();
 		$container->register('named', 'stdClass');
 		$container->register('depending', 'NamedParamAlias', function($entry){
-			$entry->paramAlias('alias', 'named');
+			$entry->aliasParam('alias', 'named');
 		});
 
 		$result = $container->resolve('depending');

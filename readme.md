@@ -131,7 +131,7 @@ When resolving dependencies the container has a couple of ways to automatically 
 
 * named parameters,
 * method injection,
-* param injection,
+* param aliases,
 * or class hinting.
 
 ### Named params… wait what?
@@ -187,4 +187,25 @@ class Depending
 }
 
 $depending = $resolving->resolve('Depending');
+```
+
+### Param aliasing
+
+To compliment named parameters it's possible to define param aliases. This converts the the reference before looking it up. This is handy when you've want to reference a nested dependency.
+
+```
+class Depending
+{
+	public $dep;
+	
+	public function __construct($paramAlias)
+	{
+		$this->dep = $paramAlias;
+	}
+}
+
+$container->register('del', 'Depending', function($entry) {
+	$entry->aliasParam('paramAlias', 'stdClass');
+	// Inject a stdClass into Depending
+});
 ```
