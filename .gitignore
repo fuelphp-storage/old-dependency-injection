@@ -13,3 +13,4 @@ index.php
 .idea
 vendor
 composer.phar
+coverage
