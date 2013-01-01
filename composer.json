@@ -2,7 +2,7 @@
 	"name": "fuelphp/dependency-injection",
 	"type": "library",
 	"description": "Dependency handling.",
-	"keywords": ["Alias", "Aliassing"],
+	"keywords": ["dependency", "injection", "dpenedencies"],
 	"homepage": "https://github.com/fuelphp/dependency-injection",
 	"license": "MIT",
 	"authors": [
