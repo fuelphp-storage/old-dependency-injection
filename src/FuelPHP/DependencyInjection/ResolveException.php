@@ -1,5 +1,5 @@
 <?php
 
-namespace Fuel\DependencyInjection;
+namespace FuelPHP\DependencyInjection;
 
 class ResolveException extends \Exception {}

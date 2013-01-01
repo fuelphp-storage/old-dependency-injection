@@ -9,7 +9,7 @@ injection methods are provider to suit you in many different use-cases.
 ## Creating a container
 
 ```
-$container = new Fuel\DependencyInjection\Container;
+$container = new FuelPHP\DependencyInjection\Container;
 ```
 
 ## Register a dependency resolver
@@ -33,7 +33,7 @@ try
 {
 	$dep = $container->resolve('dependency.identifier');
 }
-catch (Fuel\DepencencyInjection\ResolverException $e)
+catch (FuelPHP\DepencencyInjection\ResolverException $e)
 {
 	// The dependency was not resolved
 }

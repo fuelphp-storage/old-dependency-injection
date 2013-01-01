@@ -1,6 +1,6 @@
 <?php
 
-namespace Fuel\DependencyInjection;
+namespace FuelPHP\DependencyInjection;
 
 class Container
 {
@@ -25,7 +25,7 @@ class Container
 	 * @param   string  $identifier  dependency identifier
 	 * @param   string  $name        optional reference name
 	 * @return  mixed   resolved dependency
-	 * @throws  Fuel\DependencyInjection\ResolveException
+	 * @throws  FuelPHP\DependencyInjection\ResolveException
 	 */
 	public function resolve($identifier, $name = null)
 	{

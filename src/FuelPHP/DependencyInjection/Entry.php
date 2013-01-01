@@ -1,6 +1,6 @@
 <?php
 
-namespace Fuel\DependencyInjection;
+namespace FuelPHP\DependencyInjection;
 
 class Entry extends Resolver
 {
@@ -13,7 +13,7 @@ class Entry extends Resolver
 	 * Constructor.
 	 *
 	 * @param  callable                            $factory
-	 * @param  Fuel\DependencyInjection\Container  $container  container
+	 * @param  FuelPHP\DependencyInjection\Container  $container  container
 	 */
 	public function __construct($factory, $container = null)
 	{

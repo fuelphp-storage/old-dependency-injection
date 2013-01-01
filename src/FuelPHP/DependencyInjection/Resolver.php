@@ -1,6 +1,6 @@
 <?php
 
-namespace Fuel\DependencyInjection;
+namespace FuelPHP\DependencyInjection;
 
 abstract class Resolver
 {
@@ -15,7 +15,7 @@ abstract class Resolver
 	protected $preferSingleton = false;
 
 	/**
-	 * @var  Fuel\DependencyInjection\Container  $container  container
+	 * @var  FuelPHP\DependencyInjection\Container  $container  container
 	 */
 	protected $container;
 
@@ -42,7 +42,7 @@ abstract class Resolver
 	/**
 	 * Sets the Container
 	 *
-	 * @param   Fuel\DependencyInjection\Container  $container  container
+	 * @param   FuelPHP\DependencyInjection\Container  $container  container
 	 * @return  $this
 	 */
 	public function setContainer(Container $container)
@@ -130,7 +130,7 @@ abstract class Resolver
 	 * @param   string  $identifier  identifier
 	 * @param   string  $name        instance name
 	 * @return  object  resolved dependency
-	 * @throws  Fuel\DependencyInjection\ResolveException
+	 * @throws  FuelPHP\DependencyInjection\ResolveException
 	 */
 	public function resolve($identifier, $name)
 	{

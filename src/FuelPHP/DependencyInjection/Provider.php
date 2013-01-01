@@ -1,13 +1,13 @@
 <?php
 
-namespace Fuel\DependencyInjection;
+namespace FuelPHP\DependencyInjection;
 
 abstract class Provider extends Resolver
 {
 	/**
 	 * Provide entries to the container
 	 *
-	 * @param   Fuel\DependencyInjection\Container  $container  container
+	 * @param   FuelPHP\DependencyInjection\Container  $container  container
 	 * @return  void
 	 */
 	public function provide($container)
@@ -23,7 +23,7 @@ abstract class Provider extends Resolver
 	/**
 	 * Create a new object
 	 *
-	 * @param   Fuel\DependencyInjection\Container  $container  container
+	 * @param   FuelPHP\DependencyInjection\Container  $container  container
 	 * @param   string                              $suffix  identifier suffix
 	 * @return  object                              dependency
 	 */
