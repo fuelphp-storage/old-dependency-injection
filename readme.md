@@ -1,5 +1,7 @@
 # Dependency Injection
 
+[![Build Status](https://travis-ci.org/fuelphp/dependency-injection.png?branch=master)](https://travis-ci.org/fuelphp/dependency-injection)
+
 Simple yet powerful dependency injection package. The package provides an
 easy way to define and resolve dependencies. Multiple resolver types and
 injection methods are provider to suit you in many different use-cases.
@@ -144,7 +146,7 @@ class Something {}
 class Depending
 {
 	protected $dependancy;
-	
+
 	public function __construct($myDependency)
 	{
 		$this->dependency = $myDependency;
@@ -179,7 +181,7 @@ class Something {}
 class Depending
 {
 	protected $dep;
-	
+
 	public function __construct(Something $dep)
 	{
 		$this->dep = $dep;
@@ -197,7 +199,7 @@ To compliment named parameters it's possible to define param aliases. This conve
 class Depending
 {
 	public $dep;
-	
+
 	public function __construct($paramAlias)
 	{
 		$this->dep = $paramAlias;
