@@ -1,12 +1,12 @@
 <?php
 
-use Fuel\DependencyInjection\Container;
-use Fuel\DependencyInjection\Entry;
+use FuelPHP\DependencyInjection\Container;
+use FuelPHP\DependencyInjection\Entry;
 
 class ContainerTests extends PHPUnit_Framework_TestCase
 {
 	/**
-	 * @expectedException Fuel\DependencyInjection\ResolveException
+	 * @expectedException FuelPHP\DependencyInjection\ResolveException
 	 */
 	public function testResolveFail()
 	{
@@ -98,7 +98,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException Fuel\DependencyInjection\ResolveException
+	 * @expectedException FuelPHP\DependencyInjection\ResolveException
 	 */
 	public function testBlockSingleton()
 	{
@@ -110,7 +110,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException Fuel\DependencyInjection\ResolveException
+	 * @expectedException FuelPHP\DependencyInjection\ResolveException
 	 */
 	public function testBlockNamedSingleton()
 	{
@@ -139,7 +139,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  Fuel\DependencyInjection\ResolveException
+	 * @expectedException  FuelPHP\DependencyInjection\ResolveException
 	 */
 	public function testUnregister()
 	{
@@ -154,7 +154,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 	public function testRegisterConfig()
 	{
 		$container = new Container();
-		$mock = Mockery::mock('Fuel\DependencyInjection\Entry', function($mock) use ($container){
+		$mock = Mockery::mock('FuelPHP\DependencyInjection\Entry', function($mock) use ($container){
 			$mock->shouldReceive('setContainer')
 				->once()
 				->with($container)
@@ -171,7 +171,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 	public function testProviderRegister()
 	{
 		$container = new Container();
-		$provider = Mockery::mock('Fuel\DependencyInjection\Provider', function($mock) use ($container) {
+		$provider = Mockery::mock('FuelPHP\DependencyInjection\Provider', function($mock) use ($container) {
 			$mock->shouldReceive('setContainer')
 				->once()
 				->with($container)
@@ -217,7 +217,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  Fuel\DependencyInjection\ResolveException
+	 * @expectedException  FuelPHP\DependencyInjection\ResolveException
 	 */
 	public function testProfiderForgeFail()
 	{
@@ -227,7 +227,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  Fuel\DependencyInjection\ResolveException
+	 * @expectedException  FuelPHP\DependencyInjection\ResolveException
 	 */
 	public function testAllowSingleton()
 	{
@@ -280,7 +280,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  Fuel\DependencyInjection\ResolveException
+	 * @expectedException  FuelPHP\DependencyInjection\ResolveException
 	 */
 	public function testResolveParamFail()
 	{
@@ -289,7 +289,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  Fuel\DependencyInjection\ResolveException
+	 * @expectedException  FuelPHP\DependencyInjection\ResolveException
 	 */
 	public function testProviderLookupFail()
 	{
@@ -300,7 +300,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException  Fuel\DependencyInjection\ResolveException
+	 * @expectedException  FuelPHP\DependencyInjection\ResolveException
 	 */
 	public function testProviderUnregister()
 	{

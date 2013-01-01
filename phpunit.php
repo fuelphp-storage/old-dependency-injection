@@ -2,7 +2,7 @@
 
 include './vendor/autoload.php';
 
-class ProviderThatProvides extends Fuel\DependencyInjection\Provider
+class ProviderThatProvides extends FuelPHP\DependencyInjection\Provider
 {
 	public function provide($container)
 	{
@@ -10,7 +10,7 @@ class ProviderThatProvides extends Fuel\DependencyInjection\Provider
 	}
 }
 
-class ProviderThatForges extends Fuel\DependencyInjection\Provider
+class ProviderThatForges extends FuelPHP\DependencyInjection\Provider
 {
 	public function forge($container, $suffix)
 	{
