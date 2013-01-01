@@ -47,7 +47,7 @@ class Container
 
 		if ( ! $dependency)
 		{
-				$dependency = $this->dynamicLoopup($identifier, $name);
+				$dependency = $this->dynamicLookup($identifier, $name);
 		}
 
 		// We have failed to resolve the dependencies,
@@ -153,7 +153,7 @@ class Container
 	 * @param   string  $name        instance name
 	 * @return  mixed  resolved resource
 	 */
-	public function dynamicLoopup($identifier, $name = null)
+	public function dynamicLookup($identifier, $name = null)
 	{
 		$entry = new Entry($identifier, $this);
 
