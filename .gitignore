@@ -14,3 +14,4 @@ index.php
 vendor
 composer.phar
 coverage
+composer.lock

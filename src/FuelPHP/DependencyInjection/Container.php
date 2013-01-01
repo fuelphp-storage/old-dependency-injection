@@ -30,7 +30,7 @@ class Container
 	public function resolve($identifier, $name = null)
 	{
 		// Return any previously named instances
-		if (func_num_args() > 1 and $name !== false and $cached = $this->findCached($identifier, $name))
+		if ($name !== false and $cached = $this->findCached($identifier, $name))
 		{
 			return $cached;
 		}

@@ -80,7 +80,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 		$hashD = spl_object_hash($d);
 
 		$this->assertEquals($hashA, $hashB);
-		$this->assertTrue($hashB !== $hashC);
+		$this->assertTrue($hashB === $hashC);
 		$this->assertTrue($hashA !== $hashD);
 	}
 
