@@ -129,10 +129,11 @@ abstract class Resolver
 	 *
 	 * @param   string  $identifier  identifier
 	 * @param   string  $name        instance name
+	 * @param   array   $arguments   arguments
 	 * @return  object  resolved dependency
 	 * @throws  FuelPHP\DependencyInjection\ResolveException
 	 */
-	public function resolve($identifier, $name)
+	public function resolve($identifier, $name, $arguments)
 	{
 		// Get singleton preferences.
 		$this->prepareIdentifiers($identifier, $name);
@@ -145,11 +146,11 @@ abstract class Resolver
 			$suffix = trim($suffix, '.\\');
 		}
 
-		$result = $this->forge($this->container, $suffix ?: null);
+		$result = $this->forge($this->container, $suffix ?: null, $arguments);
 
 		// Forge can return a string, in which case we'll need
 		// to convert that into a class.
-		$result = $this->formatOutput($result);
+		$result = $this->formatOutput($result, $arguments);
 
 		// Resolve method injections.
 		if ( ! empty($this->methodInjections))
@@ -167,11 +168,12 @@ abstract class Resolver
 	/**
 	 * Ensure an an object instance.
 	 *
-	 * @param   mixed   $result  forge result
+	 * @param   mixed   $result     forge result
+	 * @param   array   $arguments  arguments
 	 * @return  object  resolved dependency
 	 * @throws  ResolveException
 	 */
-	protected function formatOutput($result)
+	protected function formatOutput($result, $arguments)
 	{
 		if (is_callable($result))
 		{
@@ -185,7 +187,7 @@ abstract class Resolver
 
 		if (is_string($result) and class_exists($result, true))
 		{
-			return $this->createInstance($result);
+			return $this->createInstance($result, $arguments);
 		}
 
 		throw new ResolveException('Could not resolve, unexpected output output: '.print_r($result, true));
@@ -200,6 +202,11 @@ abstract class Resolver
 	 */
 	public function resolveParameter($param)
 	{
+		if ( ! $param instanceof \ReflectionParameter)
+		{
+			return $param;
+		}
+
 		if ($this->resolveParamAlias)
 		{
 			$identifier = $param->getName();
@@ -271,10 +278,11 @@ abstract class Resolver
 	/**
 	 * Resolve class dependencies.
 	 *
-	 * @param   string  $class  class name
+	 * @param   string  $class      class name
+	 * @param   array   $arguments  arguments
 	 * @return  object  resolved object with injected dependencies
 	 */
-	protected function createInstance($class)
+	protected function createInstance($class, $arguments)
 	{
 		if ( ! $this->resolveParamAlias and ! $this->resolveParamClass)
 		{
@@ -291,8 +299,17 @@ abstract class Resolver
 			return $reflection->newInstance();
 		}
 
+		// Get the reflection parameters
+		$parameters = $constructor->getParameters();
+
+		// And replace any that are given
+		foreach (array_values($arguments) as $position => $argument)
+		{
+			$parameters[$position] = $argument;
+		}
+
 		$resolver = array($this, 'resolveParameter');
-		$params = array_map($resolver, $constructor->getParameters());
+		$params = array_map($resolver, $parameters);
 
 		return $reflection->newInstanceArgs($params);
 	}

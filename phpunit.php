@@ -86,3 +86,13 @@ class InjectableThroughMethod
 		$this->object = $object;
 	}
 }
+
+class SupplyParams extends stdClass
+{
+	public function __construct($one, $two)
+	{
+		$this->one = $one;
+		$this->two = $two;
+	}
+
+}

@@ -188,7 +188,7 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 				->once()
 				->shouldReceive('resolve')
 				->once()
-				->with('base.node.named', null)
+				->with('base.node.named', null, array())
 				->andReturn('return value');
 		});
 
@@ -338,5 +338,23 @@ class ContainerTests extends PHPUnit_Framework_TestCase
 		$dep = $container->resolve('dep');
 		$this->assertEquals($object, $dep->string);
 		$this->assertInstanceOf('stdClass', $dep->object);
+	}
+
+	public function testForgeWithParams()
+	{
+		$container = new Container;
+		$result = $container->forge('SupplyParams', 1, 2);
+
+		$this->assertEquals(1, $result->one);
+		$this->assertEquals(2, $result->two);
+	}
+
+	public function testResolveWithParams()
+	{
+		$container = new Container;
+		$result = $container->resolve('SupplyParams', null, 1, 2);
+
+		$this->assertEquals(1, $result->one);
+		$this->assertEquals(2, $result->two);
 	}
 }

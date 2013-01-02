@@ -29,6 +29,9 @@ class Container
 	 */
 	public function resolve($identifier, $name = null)
 	{
+		$arguments = func_get_args();
+		$arguments = array_slice($arguments, 2);
+
 		// Return any previously named instances
 		if ($name !== false and $cached = $this->findCached($identifier, $name))
 		{
@@ -36,18 +39,18 @@ class Container
 		}
 
 		// Try to resolve from a local entries
-		$dependency = $this->resolveEntry($identifier, $name);
+		$dependency = $this->resolveEntry($identifier, $name, $arguments);
 
 		if ( ! $dependency and ! empty($this->providers))
 		{
 			// Fall back to providers, this is
 			// more expensive.
-			$dependency = $this->providerLookup($identifier, $name);
+			$dependency = $this->providerLookup($identifier, $name, $arguments);
 		}
 
 		if ( ! $dependency)
 		{
-				$dependency = $this->dynamicLookup($identifier, $name);
+			$dependency = $this->dynamicLookup($identifier, $name, $arguments);
 		}
 
 		// We have failed to resolve the dependencies,
@@ -67,11 +70,11 @@ class Container
 	 * @param   string      $name        optional instance name
 	 * @return  mixed|null  resoled result if available, otherwise null
 	 */
-	public function resolveEntry($identifier, $name = null)
+	public function resolveEntry($identifier, $name = null, $arguments)
 	{
 		if (isset($this->entries[$identifier]))
 		{
-			return $this->entries[$identifier]->resolve($identifier, $name);
+			return $this->entries[$identifier]->resolve($identifier, $name, $arguments);
 		}
 	}
 
@@ -118,31 +121,41 @@ class Container
 	 */
 	public function singleton($identifier)
 	{
-		return $this->resolve($identifier, $identifier);
+		$arguments = func_get_args();
+		array_unshift($arguments, $identifier);
+
+		return call_user_func_array(array($this, 'resolve'), $arguments);
 	}
 
 	/**
 	 * Forge a new instance.
 	 *
 	 * @param   string  $identifier  dependency identifier
-	 * @return  mixed  resolved dependency
+	 * @return  mixed   resolved dependency
 	 */
 	public function forge($identifier)
 	{
-		return $this->resolve($identifier, false);
+		$arguments = func_get_args();
+		array_shift($arguments);
+		array_unshift($arguments, false);
+		array_unshift($arguments, $identifier);
+
+		return call_user_func_array(array($this, 'resolve'), $arguments);
 	}
 
 	/**
 	 * Resolve a dependency through registered providers.
 	 *
-	 * @param   string  $identifier  identifier
-	 * @param   string  $name        instance name
+	 * @param   string       $identifier  identifier
+	 * @param   string       $name        instance name
+	 * @param   array        $arguments   arguments
+	 * @return  object|null  resolved object when found, null otherwise
 	 */
-	public function providerLookup($identifier, $name = null)
+	public function providerLookup($identifier, $name, $arguments)
 	{
 		if ($provider = $this->findProvider($identifier))
 		{
-			return $provider->resolve($identifier, $name);
+			return $provider->resolve($identifier, $name, $arguments);
 		}
 	}
 
@@ -151,15 +164,16 @@ class Container
 	 *
 	 * @param   string  $idenfitier  identifier
 	 * @param   string  $name        instance name
+	 * @param   array   $arguments   arguments array
 	 * @return  mixed  resolved resource
 	 */
-	public function dynamicLookup($identifier, $name = null)
+	public function dynamicLookup($identifier, $name = null, $arguments = array())
 	{
 		$entry = new Entry($identifier, $this);
 
 		try
 		{
-			return $entry->resolve($identifier, $name);
+			return $entry->resolve($identifier, $name, $arguments);
 		}
 		catch (ResolveException $e)
 		{
@@ -217,10 +231,10 @@ class Container
 	 * @param   string  $name        dependency name
 	 * @return  $this
 	 */
-	public function inject($identifier, &$dependency, $name = null)
+	public function inject($identifier, $dependency, $name = null)
 	{
 		$cacheKey = $identifier.'::'.($name ?: $identifier);
-		$this->instances[$cacheKey] = &$dependency;
+		$this->instances[$cacheKey] = $dependency;
 
 		return $this;
 	}
