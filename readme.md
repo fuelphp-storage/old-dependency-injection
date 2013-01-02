@@ -211,3 +211,28 @@ $container->register('del', 'Depending', function($entry) {
 	// Inject a stdClass into Depending
 });
 ```
+
+## Constructor arguments.
+
+While it's possible to automatically resolve all the constructor arguments, you can also supply them through the `forge` or `resolve` method.
+
+```
+class WithParams
+{
+	public function __construct($one, $two)
+	{
+		$this->one = $one;
+		$this->two = $two;
+	}
+}
+
+// forge with parameters
+$container->forge('WithParams', 1, 2);
+
+// resolve with parameters
+$named = $container->resolve('WithParams', 'name', 1, 2);
+$unnamed = $container->resolve('WithParams', null, 1, 2);
+
+
+```
+

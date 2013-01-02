@@ -5,7 +5,7 @@ namespace FuelPHP\DependencyInjection;
 abstract class Resolver
 {
 	/**
-	 * @var  boolean  $allowSIngleton  wether to allow singletons
+	 * @var  boolean  $allowSingleton  wether to allow singletons
 	 */
 	protected $allowSingleton = true;
 
