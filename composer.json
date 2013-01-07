@@ -2,7 +2,7 @@
 	"name": "fuelphp/dependency-injection",
 	"type": "library",
 	"description": "Dependency handling.",
-	"keywords": ["dependency", "injection", "dpenedencies"],
+	"keywords": ["dependency", "injection", "dependencies"],
 	"homepage": "https://github.com/fuelphp/dependency-injection",
 	"license": "MIT",
 	"authors": [
